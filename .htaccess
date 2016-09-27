@@ -1,0 +1,10 @@
+# Turn on URL rewriting
+RewriteEngine On
+
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+
+# Rewrite all other URLs to index.php/URL
+RewriteRule .* pagepageserver.php?pagepagepage=$0&%{QUERY_STRING} [PT]
