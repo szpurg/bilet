@@ -1,7 +1,7 @@
 <?php require 'header.php'; ?>
 <h1>Nowe wydarzenie</h1>
 
-<form action="<?php print $this->getUri()?>saveEvent" method="post">
+<form action="<?php print $this->getUri()?>saveNewEvent" method="post">
     <div>
         <label>Nazwa wydarzenia: <input type="text" name="name" /></label>
     </div>

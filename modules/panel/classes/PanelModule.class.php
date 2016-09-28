@@ -23,14 +23,15 @@ class PanelModule {
         }
     }
     public function index() {
-        $this->setVar('events', $this->loadData('events'));
+        $this->setVar('events', event::fetchList());
         $this->loadTemplate('index');
     }
     
     public function ActionManage() {
         $identifier = $this->args[0];
+        $index = $this->args[1];
         
-        $event = $this->getEvent($identifier);
+        $event = event::fetch($identifier, $index);
         if (!$event) {
             die("Brak zdefiniowanego wydarzenia $event");
         }
@@ -39,6 +40,8 @@ class PanelModule {
         
         $this->setVar('event', $event);
         $this->setVar('sectors', $proxy->getSectors());
+        $this->setVar('identifier', $identifier);
+        $this->setVar('index', $index);
         $this->loadTemplate('manage');
         
     }
@@ -53,33 +56,36 @@ class PanelModule {
     }
     
     public function ActionSaveEvent() {
+        $identifier = $this->args[0];
+        $index = $this->args[1];
+        
+        $event = event::fetch($identifier, $index);
+        if ($event) {
+            
+        }
+        
+    }
+    
+    public function ActionSaveNewEvent() {
         if ($this->getUserVar('back')) {
             $this->redirect("index");
         }
         $name = $this->getUserVar('name');
         $url = $this->getUserVar('url');
         
-        if (preg_match("#^http[s]{0,1}://.+?/([^/]+)$#", $url, $matches)) {
+        if (preg_match("#^http[s]{0,1}://[^/]+/(.+)$#", $url, $matches)) {
            $eventIdentifier = $matches[1];
         }
         else {
             die("Nieprawidlowy adres url wydarzenia");
         }
         
-        $events = $this->loadData('events');
-        if (!isset($events[$eventIdentifier])) {
-            $events[$eventIdentifier] = array(
-                'name' => $name,
-                'url' => $url,
-                'identifier' => $eventIdentifier
-            );
-            $this->saveData('events', $events);
-            $this->redirect('index');
-        }
-        else {
-            die("Wydarzenie juz istnieje");
-        }
-        
+        $event = new event;
+        $event->setName($name);
+        $event->setUrl($url);
+        $event->setIdentifier($eventIdentifier);
+        $event->save($eventIdentifier, true);
+        $this->redirect('index');
     }
     
     public function redirect($action) {
@@ -98,24 +104,6 @@ class PanelModule {
     
     public function getUri() {
         return MODULE_URI;
-    }
-    
-    public function loadData($dataName) {
-        if (file_exists(DATA_PATH . $dataName . ".dat")) {
-            $data = file_get_contents(DATA_PATH . $dataName . ".dat");
-            if ($data) {
-                return unserialize($data);
-            }
-        }
-        return null;
-    }
-    
-    public function saveData($dataName, $data) {
-        $file = fopen(DATA_PATH . $dataName . ".dat", "w");
-        flock($file, LOCK_EX);
-        fputs($file, serialize($data));
-        flock($file, LOCK_UN);
-        fclose($file);
     }
     
     public function getUserVar($name) {

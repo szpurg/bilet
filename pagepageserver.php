@@ -16,8 +16,8 @@ $GLOBALS['modules'] = array(
     'panel',
 );
 function __autoload($name) {
-    if (file_exists(dirname(__FILE__) . "/$name.class.php")) {
-        require_once dirname(__FILE__) . "/$name.class.php";
+    if (file_exists(dirname(__FILE__) . "/classes/$name.class.php")) {
+        require_once dirname(__FILE__) . "/classes/$name.class.php";
         return;
     }
     $modules = $GLOBALS['modules'];

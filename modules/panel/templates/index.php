@@ -12,13 +12,15 @@
             <th>URL</th>
             <th>Funkcje</th>
         </tr>
-    <?php foreach($this->events as $event):?>
-        <tr>
-            <td><?php print $event['identifier']?></td>
-            <td><?php print $event['name']?></td>
-            <td><?php print $event['url']?></td>
-            <td><a href="<?php print $this->getUri() . 'manage/' . $event['identifier']?>">[ZARZĄDZAJ]</a></td>
-        </tr>
+    <?php foreach($this->events as $eventArray):?>
+        <?php foreach ($eventArray as $index => $event):?>
+            <tr>
+                <td><?php print $event->getIdentifier()?></td>
+                <td><?php print $event->getName()?></td>
+                <td><?php print $event->getUrl()?></td>
+                <td><a href="<?php print $this->getUri() . 'manage/' . $event->getIdentifier() . '/' . $index?>">[ZARZĄDZAJ]</a></td>
+            </tr>
+        <?php endforeach;?>
     <?php endforeach;?>
     </table>
 <?php else:?>

@@ -46,7 +46,7 @@
             border: solid black 1px;
             width: 30%;
             padding: 1%;
-            height: 400px;
+            height: 300px;
             overflow: auto;
             float: right;
             
