@@ -56,6 +56,8 @@
         <input type="submit" name="saveAccount" value="Dodaj" />
     </form>
 </div>
-    
+<script type="text/javascript">
+sectorsActions.init();
+</script>    
 <?php
 require 'footer.php';

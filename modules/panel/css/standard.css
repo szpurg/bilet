@@ -25,6 +25,11 @@ input[type="text"] {
     display: block;
     width: 100%;
 }
+
+h2 > span {
+    font-size: 0.6em;
+}
+
 label {
     display: block;
 }
@@ -46,7 +51,9 @@ th {
 td a {
     font-size: 0.75em;
 }
-
+td.status {
+    font-size: 0.6em;
+}
 
 .column a,
 .column label {
@@ -97,5 +104,10 @@ td a {
 
 .columnspan input[type="submit"] {
     float: left;
+}
+
+.turbo {
+    color: orange;
+    font-weight: bold;
 }
 

@@ -77,7 +77,34 @@ class PanelModule {
     }
     
     public function ActionNewEvent() {
-        $this->loadTemplate('newEvent');
+        $this->loadTemplate('editEvent');
+    }
+    
+    public function ActionSaveEditedEvent() {
+        $identifier = base64_decode($this->args[0]);
+        $index = $this->args[1];
+        
+        $event = event::fetch($identifier, $index);
+        if (!$event) {
+            die("Brak zdefiniowanego wydarzenia $event");
+        }
+        $event->setName($this->getUserVar('name'));
+        $event->setUrl($this->getUserVar('url'));
+        $event->save($identifier, true, $index);
+        $this->redirect('index');
+    }
+    
+    public function ActionEditEvent() {
+        $identifier = base64_decode($this->args[0]);
+        $index = $this->args[1];
+        
+        $event = event::fetch($identifier, $index);
+        if (!$event) {
+            die("Brak zdefiniowanego wydarzenia $event");
+        }
+        $this->setVar('event', $event);
+        $this->setVar('index', $index);
+        $this->loadTemplate('editEvent');
     }
     
     private function getEvent($identifier) {

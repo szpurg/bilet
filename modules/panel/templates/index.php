@@ -19,7 +19,15 @@
                 <td><a href="<?php print $this->getUri() . 'manage/' . $event->getIdentifier(true) . '/' . $index?>"><?php print $event->getIdentifier()?></a></td>
                 <td><?php print $event->getName()?></td>
                 <td><?php print $event->getUrl()?></td>
-                <td><?php print $event->getActive() ? 'Uruchomione (sektory:&nbsp' . count($event->getSectors()) . ') (konta:&nbsp' . count($event->getUsers()) . ')' . ($event->getTurbo() ? ' (turbo)' : ' (normalny)') . ($event->getSetting('reverseBuy') ? ' (od&nbsp;dołu)' : '') : 'Nieaktywne'?></td>
+                <td class="status"><?php print ($event->getActive() ? 
+                            'Uruchomione' : 'Nieaktywne') 
+                            . '<br>(wybrane&nbsp;sektory:&nbsp' 
+                            . count($event->getSectors()) 
+                            . ')<br>(konta:&nbsp' . count($event->getUsers()) . ')' 
+                            . ($event->getTurbo() ? '<br><span class="turbo">(turbo)</span>' : '<br>(normalny)') 
+                            . ($event->getSetting('reverseBuy') ? '<br>(od&nbsp;dołu)' : '') 
+                            ?>
+                </td>
                 <td>
                     <div>
                         <a href="<?php print $this->getUri() . 'manage/' . $event->getIdentifier(true) . '/' . $index?>">
