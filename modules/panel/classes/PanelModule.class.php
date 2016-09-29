@@ -6,6 +6,9 @@ class PanelModule {
     protected $args;
     
     public function __construct($args) {
+        if ($this->getUserVar('back')) {
+            $this->redirect("index");
+        }
         array_shift($args);
         $action = reset($args);
         $this->args = $args;
@@ -14,6 +17,9 @@ class PanelModule {
             array_shift($args);
             $this->args = $args;
             call_user_func(array($this, $method));
+            if ($this->getUserVar('returner')) {
+                $this->redirect($this->getUserVar('returner'));
+            }
         }
         else if ($action) {
             die("Strona nie istnieje");
@@ -27,8 +33,32 @@ class PanelModule {
         $this->loadTemplate('index');
     }
     
+    public function ActionSaveAccount() {
+        $account = $this->getUserVar('account');
+        
+        $login = $account['login'];
+        if (user::fetch($login)) {
+            die('konto juz istnieje');
+        }
+        
+        $user = new user;
+        $user->setLogin(trim($account['login']));
+        $user->setPassword($account['password']);
+        
+        $user->save($account['login']);
+        
+    }
+    
+    public function ActionDeleteAccount() {
+        $login = $this->args[0];
+        
+        $user = user::fetch($login);
+        if ($user) {
+            $user->delete($login);
+        }
+    }
     public function ActionManage() {
-        $identifier = $this->args[0];
+        $identifier = base64_decode($this->args[0]);
         $index = $this->args[1];
         
         $event = event::fetch($identifier, $index);
@@ -40,7 +70,7 @@ class PanelModule {
         
         $this->setVar('event', $event);
         $this->setVar('sectors', $proxy->getSectors());
-        $this->setVar('identifier', $identifier);
+        $this->setVar('users', user::fetchList());
         $this->setVar('index', $index);
         $this->loadTemplate('manage');
         
@@ -55,21 +85,49 @@ class PanelModule {
         return isset($events[$identifier]) ? $events[$identifier] : null;
     }
     
+    public function ActionRemoveEvent() {
+        $identifier = base64_decode($this->args[0]);
+        $index = $this->args[1];
+        $event = event::fetch($identifier, $index);
+        if ($event instanceof event) {
+            $event->delete($identifier, $index);
+        }
+        $this->redirect('index');
+    }
+    
+    public function ActionSwitchEvent() {
+        $identifier = base64_decode($this->args[0]);
+        $index = $this->args[1];
+        $event = event::fetch($identifier, $index);
+        if ($event instanceof event) {
+            if ($event->getActive()) {
+                $event->setActive(0);
+            }
+            else {
+                $event->setActive(1);
+            }
+            $event->save($identifier, true, $index);
+        }
+        $this->redirect('index');
+    }
+    
     public function ActionSaveEvent() {
-        $identifier = $this->args[0];
+        $identifier = base64_decode($this->args[0]);
         $index = $this->args[1];
         
         $event = event::fetch($identifier, $index);
-        if ($event) {
-            
+        if ($event instanceof event) {
+            $sectors = $this->getUserVar('sectors');
+            $users = $this->getUserVar('users');
+            $event->setSectors($sectors);
+            $event->setUsers($users);
+            $event->setSettings($this->getUserVar('settings'));
+            $event->save($identifier, true, $index);
+            $this->redirect('index');
         }
-        
     }
     
     public function ActionSaveNewEvent() {
-        if ($this->getUserVar('back')) {
-            $this->redirect("index");
-        }
         $name = $this->getUserVar('name');
         $url = $this->getUserVar('url');
         
@@ -107,7 +165,15 @@ class PanelModule {
     }
     
     public function getUserVar($name) {
-        return filter_input(INPUT_POST, $name);
+        if (filter_input(INPUT_POST, $name, FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY)) {
+            return filter_input(INPUT_POST, $name, FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY);
+        }
+        if (filter_input(INPUT_POST, $name)) {
+            return trim(filter_input(INPUT_POST, $name));
+        }
+        if (filter_input(INPUT_GET, $name)) {
+            return trim(filter_input(INPUT_GET, $name));
+        }
     }
     
     public function __get($name) {

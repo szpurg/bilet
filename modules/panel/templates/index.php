@@ -10,15 +10,38 @@
             <th>Identyfikator</th>
             <th>Nazwa</th>
             <th>URL</th>
+            <th>Status</th>
             <th>Funkcje</th>
         </tr>
     <?php foreach($this->events as $eventArray):?>
         <?php foreach ($eventArray as $index => $event):?>
             <tr>
-                <td><?php print $event->getIdentifier()?></td>
+                <td><a href="<?php print $this->getUri() . 'manage/' . $event->getIdentifier(true) . '/' . $index?>"><?php print $event->getIdentifier()?></a></td>
                 <td><?php print $event->getName()?></td>
                 <td><?php print $event->getUrl()?></td>
-                <td><a href="<?php print $this->getUri() . 'manage/' . $event->getIdentifier() . '/' . $index?>">[ZARZĄDZAJ]</a></td>
+                <td><?php print $event->getActive() ? 'Uruchomione (sektory:&nbsp' . count($event->getSectors()) . ') (konta:&nbsp' . count($event->getUsers()) . ')' . ($event->getTurbo() ? ' (turbo)' : ' (normalny)') . ($event->getSetting('reverseBuy') ? ' (od&nbsp;dołu)' : '') : 'Nieaktywne'?></td>
+                <td>
+                    <div>
+                        <a href="<?php print $this->getUri() . 'manage/' . $event->getIdentifier(true) . '/' . $index?>">
+                            [ZARZĄDZAJ]
+                        </a>
+                    </div>
+                    <div>
+                        <a href="<?php print $this->getUri() . 'switchEvent/' . $event->getIdentifier(true) . '/' . $index?>">
+                            [<?php print $event->getActive() ? 'ZATRZYMAJ' : 'URUCHOM'?>]
+                        </a>
+                    </div>
+                    <div>
+                        <a class="remove" href="<?php print $this->getUri() . 'removeEvent/' . $event->getIdentifier(true) . '/' . $index?>">
+                            [USUŃ]
+                        </a>
+                    </div>
+                    <div>
+                        <a href="<?php print $this->getUri() . 'editEvent/' . $event->getIdentifier(true) . '/' . $index?>">
+                            [ZMIEŃ&nbsp;DANE]
+                        </a>
+                    </div>
+                </td>
             </tr>
         <?php endforeach;?>
     <?php endforeach;?>
