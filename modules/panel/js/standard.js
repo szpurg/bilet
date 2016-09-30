@@ -22,6 +22,7 @@ var sectorsActions = {
 };
 
 $(document).ready(function() {
+    var captchaLoginProcess = null;
     $(".checkall").click(function() {
        if ($(this).is(':checked')) {
            $(this).closest('.container').find('input[type="checkbox"]').prop('checked', true);
@@ -35,5 +36,24 @@ $(document).ready(function() {
             return false;
         }
     });
+    $('.captchaActivator').click(function() {
+        var login = $(this).closest('.userContainer').find('label').first().text().trim();
+        captchaLoginProcess = login;
+        window.open($(this).attr('href'), '_blank');
+        keepCheckingUser($(this), login);
+        return false;
+    });
     
+    function keepCheckingUser($setter, login) {
+        var inv = setInterval(function() {
+            $.get('/panel/checkCaptcha/' + login, {}, function(response) {
+                if (response.status && response.status === 'ok') {
+                    clearInterval(inv);
+                    captchaLoginProcess = null;
+                    $setter.remove();
+                }
+            }, 'json');
+            
+        }, 1000);
+    }
 });

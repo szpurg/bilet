@@ -40,16 +40,35 @@ class CliModule {
         foreach($activeUsers as $user) {
             if ($user instanceof user) {
                 $status = $user->checkAccount();
+                $save = false;
                 if ($status === -1) {
-                    print $user->getLogin() . " not logged in!\n";
-                    new notification();
-                }
-                else if ($status === false) {
-                    print $user->getLogin() . " needs captcha verification!\n";
-                    new notification();
+                    if (!$user->getInvalid()) {
+                        $save = true;
+                        $user->setInvalid(true);
+                        new notification($user, NOTIFICATION_USER_INVALID);
+                    }
                 }
                 else {
-                    print $user->getLogin() . " seems ok\n";
+                    if ($user->getInvalid()) {
+                        $save = true;
+                        $user->setInvalid(false);
+                    }
+                }
+                if ($status === false) {
+                    if (!$user->getCaptchaNeeded()) {
+                        $save = true;
+                        $user->setCaptchaNeeded(true);
+                        new notification($user, NOTIFICATION_USER_CAPTCHA_NEEDED);
+                    }
+                }
+                else if ($status === true) {
+                    if ($user->getCaptchaNeeded()) {
+                        $save = true;
+                        $user->setCaptchaNeeded(false);
+                    }
+                }
+                if ($save) {
+                    $user->save($user->getLogin());
                 }
             }
         }

@@ -3,6 +3,8 @@
 class user extends DataObject {
     protected $login;
     protected $password;
+    protected $captchaNeeded;
+    protected $invalid;
     
     public function getDataIdentifier() {
         return 'users';
@@ -24,6 +26,22 @@ class user extends DataObject {
         $this->password = $password;
     }
     
+    public function getCaptchaNeeded() {
+        return $this->captchaNeeded;
+    }
+
+    public function getInvalid() {
+        return $this->invalid;
+    }
+
+    public function setCaptchaNeeded($captchaNeeded) {
+        $this->captchaNeeded = $captchaNeeded;
+    }
+
+    public function setInvalid($invalid) {
+        $this->invalid = $invalid;
+    }
+
     public function __toString() {
         return $this->login;
     }

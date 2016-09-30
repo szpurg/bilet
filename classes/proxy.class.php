@@ -29,6 +29,13 @@ class proxy {
         if ($login && $password) {
             $this->requiresLogin();
         }
+        $user = user::fetch($login);
+        if ($user instanceof user) {
+            if ($user->getCaptchaNeeded() && $this->captchaVerificationNeeded() === false) {
+                $user->setCaptchaNeeded(false);
+                $user->save($login);
+            }
+        }
     }
     
     public function captchaVerificationNeeded() {

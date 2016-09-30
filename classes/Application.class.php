@@ -39,7 +39,6 @@ class Application {
         fclose($file);
     }
     
-    
     protected function showPage() {
         $currentUser = currentUser::fetch('currentUser');
         if (!$currentUser) {
@@ -50,12 +49,17 @@ class Application {
             $currentUser->login = $newCurrentUserLogin;
             $currentUser->save('currentUser');
         }
-        $proxy = new proxy($currentUser->getUser() ? $currentUser->getUser()->getLogin() : null, $currentUser->getUser() ? $currentUser->getUser()->getPassword() : null, null);
+        $proxy = new proxy(
+                            $currentUser->getUser() ? $currentUser->getUser()->getLogin() : null, 
+                            $currentUser->getUser() ? $currentUser->getUser()->getPassword() : null, 
+                            isset($_GET['capac']) && $currentUser->getUser() 
+                                ? $currentUser->getUser()->getActiveRelatedSectorUri() 
+                                : null
+        );
         $proxy->outputResponse();
     }
     
     protected function panel() {
         $module = new PanelModule(explode("/", $this->page));
     }
-    
 }

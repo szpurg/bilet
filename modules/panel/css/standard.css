@@ -111,3 +111,12 @@ td.status {
     font-weight: bold;
 }
 
+.warning {
+    color: red;
+    font-weight: bold;
+}
+
+.smaller {
+    font-size: 0.6em;
+}
+

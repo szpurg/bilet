@@ -173,6 +173,25 @@ class PanelModule {
         $this->redirect('index');
     }
     
+    public function ActionCheckCaptcha() {
+        $login = isset($this->args[0]) ? $this->args[0] : null;
+        if ($login) {
+            $user = user::fetch($login);
+            if ($user instanceof user) {
+                print json_encode(
+                    array(
+                        'status' => !$user->getCaptchaNeeded() ? 'ok' : 'needed'
+                    )
+                );
+            }
+        }
+        else {
+            print json_encode(array(
+                'error' => "nieprawidłowy login"
+            ));
+        }
+    }
+    
     public function redirect($action) {
         $url = 'http://kupbilet.onet.pl' . MODULE_URI . ($action != "index" ? $action : '');
         header("Location: " . $url);

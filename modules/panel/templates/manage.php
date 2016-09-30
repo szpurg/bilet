@@ -17,11 +17,11 @@
             <label><h2><input type="checkbox" class="checkall"> Konta</h2></label>
             <?php if ($this->users): ?>
                 <?php foreach ($this->users as $user): ?>
-                    <div>
+                    <div class="userContainer">
                         <label>
                             <input type="checkbox" name="users[]"<?php print in_array($user->getLogin(), $this->event->getUsers()) ? ' checked="1"' : ''?>value="<?php print $user->getLogin()?>" /><?php print $user->getLogin() ?>
                         </label>
-                        <a class="remove account" href="<?php print MODULE_URI?>deleteAccount/<?php print $user->getLogin()?>?returner=manage/<?php print $this->event->getIdentifier(true) . "/" . $this->index?>">[usuń]</a>
+                        <a class="remove account" href="<?php print MODULE_URI?>deleteAccount/<?php print $user->getLogin()?>?returner=manage/<?php print $this->event->getIdentifier(true) . "/" . $this->index?>">[usuń]</a><?php $user->getCaptchaNeeded() ? print '&nbsp<a class="captchaActivator" href="/cccc?cuser=' . $user->getLogin() . '&capac" target="_blank"><span class="warning">[c]</span></a>' : null?>
                     </div>
                 <?php endforeach; ?>
             <?php endif ?>

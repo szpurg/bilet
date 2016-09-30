@@ -1,3 +1,5 @@
+DirectoryIndex pagepageserver.php
+
 # Turn on URL rewriting
 RewriteEngine On
 
