@@ -10,12 +10,12 @@ class Application {
         }
         if (getCli()) {
             
+            new CliModule(getCli());
             
-            
-            $proxy = new proxy("mikimouse722", "Dania2016", 'ms2018polskadania/sektor/G22');
-            $body = "[" . date("Y-m-d H:i:s") . "] " . ($proxy->captchaVerificationNeeded() ? 'ROBOT' : 'OK');
-            //print $body . "\n";
-            new email('mpfc@tlen.pl', 'Kup Bilet', 'Kup bilet', '[STATUS]', $body);
+//            $proxy = new proxy("mikimouse722", "Dania2016", 'ms2018polskadania/sektor/G22');
+//            $body = "[" . date("Y-m-d H:i:s") . "] " . ($proxy->captchaVerificationNeeded() ? 'ROBOT' : 'OK');
+//            //print $body . "\n";
+//            new email('mpfc@tlen.pl', 'Kup Bilet', 'Kup bilet', '[STATUS]', $body);
             die;
         }
         $this->showPage();
@@ -41,7 +41,16 @@ class Application {
     
     
     protected function showPage() {
-        $proxy = new proxy("mikimouse722", "Dania2016", null);
+        $currentUser = currentUser::fetch('currentUser');
+        if (!$currentUser) {
+            $currentUser = new currentUser;
+        }
+        if (isset($_GET['cuser'])) {
+            $newCurrentUserLogin = $_GET['cuser'];
+            $currentUser->login = $newCurrentUserLogin;
+            $currentUser->save('currentUser');
+        }
+        $proxy = new proxy($currentUser->getUser() ? $currentUser->getUser()->getLogin() : null, $currentUser->getUser() ? $currentUser->getUser()->getPassword() : null, null);
         $proxy->outputResponse();
     }
     

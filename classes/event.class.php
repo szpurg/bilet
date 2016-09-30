@@ -47,7 +47,15 @@ class event extends DataObject {
     }
     
     public function getUsers() {
-        return $this->users;
+        $assignedUsers = $this->users ? $this->users : array();
+        $users = user::fetchList();
+        $returner = array();
+        foreach($users as $login => $user) {
+            if (in_array($login, $assignedUsers)) {
+                $returner[] = $user;
+            }
+        }
+        return $returner;
     }
 
     public function setUsers($users) {
@@ -88,5 +96,27 @@ class event extends DataObject {
         return isset($settings[$name]) ? $settings[$name] : null;
     }
     
+    public static function fetchAllList() {
+        $events = event::fetchList();
+        $Events = array();
+        foreach($events as $eventArray) {
+            foreach($eventArray as $event) {
+                if ($event instanceof event && $event->getActive()) {
+                    $Events[] = $event;
+                }
+            }
+        }
+        return $Events;
+    }
+    
+    public static function getActiveEventsUsers() {
+        $users = array();
+        foreach(self::fetchAllList() as $event) {
+            if ($event instanceof event && $event->getActive()) {
+                $users = array_merge($users, $event->getUsers());
+            }
+        }
+        return array_unique($users);
+    }
 
 }

@@ -14,6 +14,7 @@ define( "MAIL_PASSWORD", 'mmojpry1' );
 
 $GLOBALS['modules'] = array(
     'panel',
+    'cli',
 );
 function __autoload($name) {
     if (file_exists(dirname(__FILE__) . "/classes/$name.class.php")) {

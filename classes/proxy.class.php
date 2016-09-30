@@ -39,7 +39,7 @@ class proxy {
             }
             return true;
         }
-        return false;
+        return 0;
     }
     
     private function getPage() {
@@ -139,6 +139,10 @@ class proxy {
         
         $this->cookies = array_merge($this->cookies, $cookies);
         $this->saveCookies();
+    }
+    
+    public function loggedIn() {
+        return preg_match("#<a href=\".+?/wyloguj#s", $this->response);
     }
     
     private function requiresLogin() {
