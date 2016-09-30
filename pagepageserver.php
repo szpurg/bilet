@@ -3,6 +3,9 @@ ini_set('display_errors', 1);
 
 define("APP_PATH", dirname(__FILE__) . "/");
 define("DATA_PATH", APP_PATH . "data/");
+if (!is_dir(DATA_PATH)) {
+    mkdir(DATA_PATH, 0777);
+}
 
 define ( "ADMIN_EMAIL", "mpfc@o2.pl" );
 

@@ -31,6 +31,12 @@ class CliModule {
     
     
     public function ActionIndex() {
+        $events = event::fetchAllList();
+        foreach($events as $event) {
+            if ($event instanceof event && $event->getActive()) {
+                $event->buy();
+            }
+        }
         
     }
     

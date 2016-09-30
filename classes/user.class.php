@@ -6,6 +6,10 @@ class user extends DataObject {
     protected $captchaNeeded;
     protected $invalid;
     
+    protected $addedToBasketInSession = 0;
+    
+    const LOGIN_LIMIT = 2;
+    
     public function getDataIdentifier() {
         return 'users';
     }
@@ -73,5 +77,71 @@ class user extends DataObject {
         }
         return true;
     }
+    
+    public function addSeatsToBasket(event $event, $sectorName) {
+        $added = 0;
+        $sector = sector::getInstance($event, $sectorName);
+        if ($this->getBasketCount() < $this->getLoginLimit()) {
+            foreach($sector->getAvailableSeats($this) as $seatUrl) {
+                if ($this->addSeatToBasket($sector, $seatUrl)) {
+                    $added++;
+                    $realCount = $this->incrementBasketCount();
+                    if ($realCount >= $this->getLoginLimit()) {
+                        break;
+                    }
+                }
+            }
+        }
+        return $added;
+    }
+    /**
+     * 
+     * @return \basket
+     */
+    public function getBasket() {
+        $basket = basket::fetch(0, null, array($this));
+        if (!$basket) {
+            $basket = new basket($this);
+        }
+        return $basket;
+    }
+    
+    public function updateBasketCount($count = null) {
+        if ($count === null) {
+            $proxy = new proxy($this->getLogin(), $this->getPassword(), $this->getActiveRelatedSectorUri());
+            $count = $proxy->getBasketCount();
+        }
+        if (is_numeric($count) && $count >= 0) {
+            $this->getBasket()->saveCount($count);
+        }
+    }
+    
+    public function incrementBasketCount() {
+        return $this->getBasket()->incrementCount();
+    }
+    
+    public function getBasketCount() {
+        return $this->getBasket()->getCount();
+    }
+
+    public function addSeatToBasket(sector $sector, $seatUrl) {
+        $uri = Application::urlToURI($seatUrl);
+        $sector->unsetAvailableSeat($this, $seatUrl);
+        print $this->getLogin() . ": " . $uri . "\n";
+        return true;
+    }
+    
+    public function getLoginLimit() {
+        return self::LOGIN_LIMIT;
+    }
+    
+    public static function fetchUser($login) {
+        if (isset(self::$usersCache[$login])) {
+            return self::$usersCache[$login];
+        }
+        return self::$usersCache[$login] = user::fetch($login);
+    }
+    
+    protected static $usersCache = array();
     
 }

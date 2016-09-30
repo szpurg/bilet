@@ -7,6 +7,10 @@ class event extends DataObject {
     protected $users;
     protected $settings;
     
+    public function __toString() {
+        return $this->identifier . "[" . $this->getIndex() . "]";
+    }
+    
     public function getName() {
         return $this->name;
     }
@@ -14,7 +18,7 @@ class event extends DataObject {
     public function getUrl() {
         return $this->url;
     }
-
+    
     public function getIdentifier($base64 = false) {
         if ($base64) {
             return base64_encode($this->identifier);
@@ -48,16 +52,17 @@ class event extends DataObject {
     
     public function getUsers() {
         $assignedUsers = $this->users ? $this->users : array();
-        $users = user::fetchList();
         $returner = array();
-        foreach($users as $login => $user) {
-            if (in_array($login, $assignedUsers)) {
+        
+        foreach($assignedUsers as $login) {
+            $user = user::fetchUser($login);
+            if ($user instanceof user) {
                 $returner[] = $user;
             }
         }
         return $returner;
     }
-
+    
     public function setUsers($users) {
         $this->users = $users;
     }
@@ -91,9 +96,60 @@ class event extends DataObject {
         $this->settings = $settings;
     }
     
+    public function getReverseBuy() {
+        return $this->getSetting('reverseBuy');
+    }
+    
     public function getSetting($name) {
         $settings = $this->getSettings();
         return isset($settings[$name]) ? $settings[$name] : null;
+    }
+    
+    public function buy() {
+        if ($this->getActive()) {
+            if ($this->getTurbo()) {
+                $this->turboBuy();
+            }
+            else {
+                $this->normalBuy();
+            }
+        }
+    }
+    
+    protected function normalBuy() {
+        $availableSectors = $this->getAvailableSectors();
+        
+        foreach($this->getUsers() as $user) {
+            $updateBasket = true;
+            foreach($availableSectors as $sectorArray) {
+                if ($user instanceof user) {
+                    if ($updateBasket) {
+                        $user->updateBasketCount();
+                        $updateBasket = false;
+                    }
+                    $user->addSeatsToBasket($this, $sectorArray['name']);
+                }
+            }
+        }
+        
+    }
+    
+    protected function turboBuy() {
+        
+    }
+    
+    protected function getAvailableSectors() {
+        $eventSectors = $this->getSectors();
+        //anonymously checking if there are seats available in defined sectors
+        $proxy = new proxy(null, null, $this->getIdentifier());
+        $sectors = $proxy->getSectors();
+        $availableSectors = array();
+        foreach($sectors as $sectorArray) {
+            if ($sectorArray['available'] && in_array($sectorArray['name'], $eventSectors)) {
+                $availableSectors[] = $sectorArray;
+            }
+        }
+        return $availableSectors;
     }
     
     public static function fetchAllList() {
@@ -118,5 +174,5 @@ class event extends DataObject {
         }
         return array_unique($users);
     }
-
+    
 }

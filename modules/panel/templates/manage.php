@@ -33,7 +33,7 @@
                 <label><input type="checkbox" name="settings[active]" value="1" <?php print $this->event->getSetting('active') ? ' checked="1"' : ''?>/> Uruchomione</label>
             </div>
             <div>
-                <label><input type="checkbox" name="settings[turbo]" value="1" <?php print $this->event->getSetting('turbo') ? ' checked="1"' : ''?>/> Wyścig szczurów</label>
+                <label><input type="checkbox" name="settings[turbo]" value="1" <?php print $this->event->getSetting('turbo') ? ' checked="1"' : ''?>/> Turbo</label>
             </div>
             <div>
                 <label><input type="checkbox" name="settings[reverseBuy]" value="1" <?php print $this->event->getSetting('reverseBuy') ? ' checked="1"' : ''?>/> Kupuj od dołu</label>

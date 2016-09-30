@@ -39,6 +39,10 @@ class Application {
         fclose($file);
     }
     
+    public static function urlToURI($url) {
+        return preg_replace("#^.*?//.+?/(.+?)$#", "\\1", $url);
+    }
+    
     protected function showPage() {
         $currentUser = currentUser::fetch('currentUser');
         if (!$currentUser) {

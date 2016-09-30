@@ -29,17 +29,80 @@ class proxy {
         if ($login && $password) {
             $this->requiresLogin();
         }
-        $user = user::fetch($login);
-        if ($user instanceof user) {
-            if ($user->getCaptchaNeeded() && $this->captchaVerificationNeeded() === false) {
-                $user->setCaptchaNeeded(false);
-                $user->save($login);
+        if ($login) {
+            $user = user::fetch($login);
+            if ($user instanceof user) {
+                if ($user->getCaptchaNeeded() && $this->captchaVerificationNeeded() === false) {
+                    $user->setCaptchaNeeded(false);
+                    $user->save($login);
+                }
+                if ($this->getBasketCount() !== -1) {
+                    $basketCount = $this->getBasketCount();
+                    if (is_numeric($basketCount)) {
+                        $user->updateBasketCount($basketCount);
+                    }
+                }
             }
         }
     }
     
+    public function getSectors() {
+        $sectors = array();
+        if (preg_match_all("#<area .+?<font .+?>([^<]+).+?href=\"(.+?)\"#si", $this->response, $Matches)) {
+            foreach($Matches[1] as $index => $matches) {
+                $freePlacesInfo = $Matches[1][$index];
+                $sectorUrl = 'https:' . $Matches[2][$index];
+                $sectorName = preg_replace("#^.+/([^/]+)$#", "\\1", $sectorUrl);
+                $freePlaces = 0;
+                if (preg_match("#([0-9]+)#", $freePlacesInfo, $m)) {
+                    $freePlaces = $m[1];
+                }
+                $sectors[] = array(
+                    'url' => $sectorUrl,
+                    'name' => $sectorName,
+                    'available' => $freePlaces
+                );
+            }
+        }
+        return $sectors;
+    }
+    
+    public function isSector() {
+        return preg_match("#/sektor/#", $this->getUrl());
+    }
+    
+    public function getBasketCount() {
+        if (!$this->captchaVerificationNeeded() && $this->isSector() && $this->login && $this->password) {
+            if (preg_match("#koszyku:.*?<span.+?>.*?([0-9]+).*?</span>#si", $this->response, $matches)) {
+                return $matches[1];
+            }
+            return 0;
+        }
+        return -1;
+    }
+    
+    public function getSeats() {
+        if ($this->isSector()) {
+            if (preg_match_all("#<div class=\"miejsce\".+?(?(?=href\=)href\='(.+?)'.+?)>#si", $this->response, $Matches)) {
+                $available = array();
+                $returner = array(
+                    'seats' => count($Matches[0]),
+                );
+                foreach($Matches[1] as $seat) {
+                    if ($seat) {
+                        $available[] = $seat;
+                    }
+                }
+                $returner['available'] = $available;
+                return $returner;
+            }
+            return false;
+        }
+        return -1;
+    }
+    
     public function captchaVerificationNeeded() {
-        if (preg_match("#/sektor/#", $this->getUrl())) {
+        if ($this->isSector()) {
             $response = $this->response;
             if (preg_match("#<div class=\"miejsce\"#si", $response)) {
                 return false;
@@ -201,27 +264,6 @@ class proxy {
         
         $this->getAndSaveCookiesFromResponse($rough_content);
         return $rough_content;
-    }
-    
-    public function getSectors() {
-        $sectors = array();
-        if (preg_match_all("#<area .+?<font .+?>([^<]+).+?href=\"(.+?)\"#si", $this->response, $Matches)) {
-            foreach($Matches[1] as $index => $matches) {
-                $freePlacesInfo = $Matches[1][$index];
-                $sectorUrl = 'https:' . $Matches[2][$index];
-                $sectorName = preg_replace("#^.+/([^/]+)$#", "\\1", $sectorUrl);
-                $freePlaces = 0;
-                if (preg_match("#([0-9]+)#", $freePlacesInfo, $m)) {
-                    $freePlaces = $m[1];
-                }
-                $sectors[] = array(
-                    'url' => $sectorUrl,
-                    'name' => $sectorName,
-                    'available' => $freePlaces
-                );
-            }
-        }
-        return $sectors;
     }
     
     public function outputResponse() {
