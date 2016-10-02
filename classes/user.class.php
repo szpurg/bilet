@@ -8,7 +8,7 @@ class user extends DataObject {
     
     protected $addedToBasketInSession = 0;
     
-    const LOGIN_LIMIT = 1;
+    const LOGIN_LIMIT = 10;
     
     public function getDataIdentifier() {
         return 'users';
