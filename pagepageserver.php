@@ -7,7 +7,7 @@ if (!is_dir(DATA_PATH)) {
     mkdir(DATA_PATH, 0777);
 }
 
-define ( "ADMIN_EMAIL", "mpfc@o2.pl" );
+define ( "ADMIN_EMAIL", "" );
 
 define( "MAIL_HOST", '' );
 define( "MAIL_SECURE", '' );
