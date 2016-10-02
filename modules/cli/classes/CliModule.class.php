@@ -35,6 +35,10 @@ class CliModule {
         }
     }
     
+    public function ActionTest() {
+        print "test\n";
+    }
+    
     public function ActionIndex() {
         $event = event::fetch('ms2018polskaarmenia', 0);
         
