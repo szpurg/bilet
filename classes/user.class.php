@@ -8,7 +8,7 @@ class user extends DataObject {
     
     protected $addedToBasketInSession = 0;
     
-    const LOGIN_LIMIT = 2;
+    const LOGIN_LIMIT = 1;
     
     public function getDataIdentifier() {
         return 'users';
@@ -83,9 +83,21 @@ class user extends DataObject {
         $sector = sector::getInstance($event, $sectorName);
         if ($this->getBasketCount() < $this->getLoginLimit()) {
             foreach($sector->getAvailableSeats($this) as $seatUrl) {
-                if ($this->addSeatToBasket($sector, $seatUrl)) {
+                $try = $this->addSeatToBasket($sector, $seatUrl);
+                if (!$try) {
+                    $try = $this->addSeatToBasket($sector, $seatUrl);
+                }
+                if (!$try) {
+                    sleep(10);
+                    $try = $this->addSeatToBasket($sector, $seatUrl);
+                }
+                if (!$try) {
+                    sleep(30);
+                    $try = $this->addSeatToBasket($sector, $seatUrl);
+                }
+                if ($try) {
                     $added++;
-                    $realCount = $this->incrementBasketCount();
+                    $realCount = $this->getBasketCount();
                     if ($realCount >= $this->getLoginLimit()) {
                         break;
                     }
@@ -128,7 +140,9 @@ class user extends DataObject {
         $uri = Application::urlToURI($seatUrl);
         $sector->unsetAvailableSeat($this, $seatUrl);
         print $this->getLogin() . ": " . $uri . "\n";
-        return true;
+        
+        $proxy = new proxy($this->getLogin(), $this->getPassword(), $uri);
+        return $proxy->getBasketCount() ? true : false;
     }
     
     public function getLoginLimit() {

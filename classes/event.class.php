@@ -105,40 +105,44 @@ class event extends DataObject {
         return isset($settings[$name]) ? $settings[$name] : null;
     }
     
-    public function buy() {
+    public function seek() {
         if ($this->getActive()) {
             if ($this->getTurbo()) {
-                $this->turboBuy();
+                $this->turboSeek();
             }
             else {
-                $this->normalBuy();
+                $this->normalSeek();
             }
         }
     }
     
-    protected function normalBuy() {
-        $availableSectors = $this->getAvailableSectors();
-        
+    protected function normalBuy($availableSectors) {
         foreach($this->getUsers() as $user) {
-            $updateBasket = true;
             foreach($availableSectors as $sectorArray) {
                 if ($user instanceof user) {
-                    if ($updateBasket) {
-                        $user->updateBasketCount();
-                        $updateBasket = false;
-                    }
                     $user->addSeatsToBasket($this, $sectorArray['name']);
                 }
             }
         }
-        
+    }
+    protected function normalSeek() {
+        $availableSectors = $this->getAvailableSectors();
+        if ($availableSectors) {
+            $this->normalBuy($availableSectors);
+        }
     }
     
-    protected function turboBuy() {
-        
+    protected function turboSeek() {
+        Application::log("start");
+        $threadsCount = settings::getInstance()->getTurboSeekingThreads();
+        if (is_numeric($threadsCount) && $threadsCount > 0) {
+            while((int)$threadsCount--) {
+                new thread('turboIndex', array($this->getIdentifier(), $this->getIndex()));
+            }
+        }
     }
     
-    protected function getAvailableSectors() {
+    public function getAvailableSectors() {
         $eventSectors = $this->getSectors();
         //anonymously checking if there are seats available in defined sectors
         $proxy = new proxy(null, null, $this->getIdentifier());

@@ -12,10 +12,10 @@ class proxy {
     private $login;
     private $password;
     private $uri;
-    
+    private $connectionLimits;
     private $cli = false;
     
-    public function __construct($login = null, $password = null, $uri = null, $argv = null) {
+    public function __construct($login = null, $password = null, $uri = null, $argv = null, $connectionLimits = false) {
         $this->argv = $argv;
         $this->cli = isset($argv);
         $this->cookiesFile = DATA_PATH . "cookies" . md5($login . $password) . ".dat";
@@ -25,7 +25,9 @@ class proxy {
         $this->url = $this->getUrl();
         $this->posts = $this->getPosts();
         $this->cookies = $this->getCookies();
+        $this->connectionLimits = $connectionLimits;
         $this->response = $this->getResponse();
+        
         if ($login && $password) {
             $this->requiresLogin();
         }
@@ -42,8 +44,15 @@ class proxy {
                         $user->updateBasketCount($basketCount);
                     }
                 }
+                if ($this->basketCleanedPreg()){
+                    $user->updateBasketCount(0);
+                }
             }
         }
+    }
+    
+    public function basketCleanedPreg() {
+        return preg_match("#koszyk jest pusty#si", $this->response);
     }
     
     public function getSectors() {
@@ -67,6 +76,11 @@ class proxy {
         return $sectors;
     }
     
+    public function isHomePage() {
+        return preg_match("#KostkiMain#si", $this->response);
+    }
+
+
     public function isSector() {
         return preg_match("#/sektor/#", $this->getUrl());
     }
@@ -79,6 +93,10 @@ class proxy {
             return 0;
         }
         return -1;
+    }
+    
+    public function successfullyAddedToBasket() {
+        return preg_match("#dodano do koszyka#si", $this->response);
     }
     
     public function getSeats() {
@@ -102,7 +120,7 @@ class proxy {
     }
     
     public function captchaVerificationNeeded() {
-        if ($this->isSector()) {
+        if ($this->isSector() && !$this->isHomePage()) {
             $response = $this->response;
             if (preg_match("#<div class=\"miejsce\"#si", $response)) {
                 return false;
@@ -255,8 +273,24 @@ class proxy {
         }
         $ch = curl_init($url);
         curl_setopt_array($ch, $options);
-
+        
+        
+        if ($this->connectionLimits || $this->connectionLimits === 0) {
+            // Two minutes waiting for free conection, then return false
+            $counter = 1200;
+            while (!Application::incrementDataIfLessThan('connections', $this->connectionLimits)) {
+                usleep(100000);
+                $counter--;
+                if ($counter <= 0) {
+                    return false;
+                }
+            }
+        }
         $rough_content = curl_exec($ch);
+        if ($this->connectionLimits || $this->connectionLimits === 0) {
+            Application::decreaseData('connections');
+        }
+        
 //        $err = curl_errno($ch);
 //        $errmsg = curl_error($ch);
 //        $header = curl_getinfo($ch);

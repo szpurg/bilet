@@ -30,7 +30,9 @@ abstract class DataObject {
             $items = $list[$dataKey];
             if ($index !== null && isset($items[$index])) {
                 unset($items[$index]);
-                $items = array_values($items);
+                if (is_numeric($index)) {
+                    $items = array_values($items);
+                }
                 $list[$dataKey] = $items;
             }
             else {

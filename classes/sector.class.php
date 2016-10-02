@@ -22,13 +22,47 @@ class sector extends DataObject {
         return 'sectors' . md5($this->eventIdentifier);
     }
     
-    public function getAvailableSeats(user $user, $forceUpdate = false) {
+    public function tryAddingSeatToBasket(event $event, user $user, $seatURI, $connectionLimits, $try = 1) {
+        if ($try == 3) {
+            sleep(5);
+        }
+        else if ($try == 4) {
+            sleep(10);
+        }
+        else if ($try == 5) {
+            return false;
+        }
+        $proxy = new proxy($user->getLogin(), $user->getPassword(), $seatURI, null, $connectionLimits);
+        
+        if ($proxy->successfullyAddedToBasket()) {
+            Application::log($user->getLogin() . " added " . $seatURI . " to basket");
+            return $seatURI;
+        }
+        else if ($proxy->getBasketCount() != -1) {
+            if (availableSeat::availableSeatTableReady($event, $seatURI)) {
+                $nextSeat = availableSeat::fetchByUri($event, $seatURI, true);
+                if ($nextSeat) {
+                    return $this->tryAddingSeatToBasket($event, $user, $nextSeat->getUri(), $connectionLimits);
+                }
+            }
+        }
+        else {
+            return $this->tryAddingSeatToBasket($user, $seatURI, $connectionLimits, $try + 1);
+        }
+        return false;
+    }
+    
+    public function getAvailableSeats(user $user = null, $forceUpdate = false) {
         $event = $this->getEvent();
         if (isset(self::$seats[$this->eventIdentifier][$event->getIndex()][$this->sectorName]) && !$forceUpdate) {
             return self::$seats[$this->eventIdentifier][$event->getIndex()][$this->sectorName];
         }
         
         $uri = $this->eventIdentifier . "/sektor/" . $this->sectorName;
+        if (!$user) {
+            $users = $event->getUsers();
+            $user = reset($users);
+        }
         $proxy = new proxy($user->getLogin(), $user->getPassword(), $uri);
         $seats = $proxy->getSeats();
         $availableSeats = isset($seats['available']) ? $seats['available'] : array();
@@ -48,6 +82,14 @@ class sector extends DataObject {
         }
     }
     
+    public function getSectorName() {
+        return $this->sectorName;
+    }
+
+    public function setSectorName($sectorName) {
+        $this->sectorName = $sectorName;
+    }
+
     /**
      * @param event $event
      * @param type $sectorName
@@ -59,6 +101,14 @@ class sector extends DataObject {
         }
         return self::$instances[$event->getIdentifier()][$event->getIndex()][$sectorName] = new sector($event, $sectorName);
     }
+    
+    public static function getBySectorURI(event $event, $sectorURI) {
+        if (preg_match("#/sektor/([^/]+)#", $sectorURI, $matches)) {
+            return self::getInstance($event, $matches[1]);
+        }
+        return null;
+    }
+    
     protected static $instances = array();
     protected static $seats = array();
 }

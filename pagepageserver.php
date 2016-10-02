@@ -9,11 +9,11 @@ if (!is_dir(DATA_PATH)) {
 
 define ( "ADMIN_EMAIL", "mpfc@o2.pl" );
 
-define( "MAIL_HOST", 'poczta.o2.pl' );
+define( "MAIL_HOST", '' );
 define( "MAIL_SECURE", '' );
 define( "MAIL_PORT", '25' );
-define( "MAIL_USERNAME", 'mpfc@o2.pl' );
-define( "MAIL_PASSWORD", 'mmojpry1' );
+define( "MAIL_USERNAME", '' );
+define( "MAIL_PASSWORD", '' );
 
 $GLOBALS['modules'] = array(
     'panel',

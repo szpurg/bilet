@@ -31,12 +31,53 @@ class Application {
         return null;
     }
     
-    public static function saveData($dataName, $data) {
-        $file = fopen(DATA_PATH . $dataName . ".dat", "w");
+    public static function saveData($dataName, $data, $serialize = true, $append = false) {
+        $file = fopen(DATA_PATH . $dataName . ".dat", $append ? 'a' : 'w');
         flock($file, LOCK_EX);
-        fputs($file, serialize($data));
+        fputs($file, $serialize ? serialize($data) : $data);
         flock($file, LOCK_UN);
         fclose($file);
+    }
+    
+    public static function log($string) {
+        Application::saveData('logs', "[" . date("Y-m-d H:i:s") . "] " . "$string\n", false, true);
+    }
+    
+    public static function incrementDataIfLessThan($dataName, $lessThan) {
+        if (!file_exists(DATA_PATH . $dataName . ".dat")) {
+            $file = fopen(DATA_PATH . $dataName . ".dat", 'w');
+            flock($file, LOCK_EX);
+            fputs($file, 0);
+            flock($file, LOCK_UN);
+            fclose($file);
+        }
+        
+        $file = fopen(DATA_PATH . $dataName . ".dat", 'r+');
+        flock($file, LOCK_EX);
+        $value = fread($file, 1024);
+        $success = false;
+        if ($value < $lessThan) {
+            $value++;
+            rewind($file);
+            fputs($file, $value);
+            $success = true;
+        }
+        flock($file, LOCK_UN);
+        fclose($file);
+        return $success;
+    }
+    
+    public static function decreaseData($dataName) {
+        $file = fopen(DATA_PATH . $dataName . ".dat", 'r+');
+        flock($file, LOCK_EX);
+        $value = fread($file, 1024);
+        $value--;
+        rewind($file);
+        $success = fputs($file, $value);
+        ftruncate($file, strlen($value));
+        flock($file, LOCK_UN);
+        fclose($file);
+        return $success;
     }
     
     public static function urlToURI($url) {
