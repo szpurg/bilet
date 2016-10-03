@@ -40,20 +40,6 @@ class CliModule {
     }
     
     public function ActionIndex() {
-        $event = event::fetch('ms2018polskaarmenia', 0);
-        
-        $availableSeats = availableSeat::fetchList(array($event, '123'));
-        
-        foreach($availableSeats as $sector) {
-            foreach ($sector as $availableSeat) {
-                if ($availableSeat->getRunning()) {
-                    print_r($availableSeat);
-                }
-            }
-        }
-        
-        die;
-        
         $events = event::fetchAllList();
         foreach($events as $event) {
             if ($event instanceof event && $event->getActive()) {
@@ -64,6 +50,22 @@ class CliModule {
     
     public function ActionProcesses() {
         print_r(running::fetchList());
+    }
+    
+    public function ActionNotifications() {
+        $operator = isset($this->args[0]) ? $this->args[0] : null;
+        if ($operator) {
+            if ($operator == 'enabled') {
+                Application::saveData('notifications', 1);
+                die("OK\n");
+            }
+            if ($operator == 'disabled') {
+                Application::saveData('notifications', 0);
+                die("OK\n");
+            }
+            die("Invalid argument\n");
+        }
+        die("No arguments\n");
     }
     
     protected function initProcess() {

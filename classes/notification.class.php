@@ -7,7 +7,9 @@ class notification {
     
     public function __construct(user $user, $type) {
         $email = ADMIN_EMAIL;
-        $this->send($user, $email, $type);
+        if (Application::loadData('notifications')) {
+            $this->send($user, $email, $type);
+        }
     }
     
     protected function send(user $user, $email, $type) {
