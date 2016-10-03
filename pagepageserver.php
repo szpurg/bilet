@@ -13,7 +13,7 @@ define( "MAIL_HOST", 'smtp.gmail.com' );
 define( "MAIL_SECURE", 'tls' );
 define( "MAIL_PORT", '587' );
 define( "MAIL_USERNAME", 'wiktor@dusza.in' );
-define( "MAIL_PASSWORD", '' );
+define( "MAIL_PASSWORD", 'AldiPiotr8309' );
 
 $GLOBALS['modules'] = array(
     'panel',

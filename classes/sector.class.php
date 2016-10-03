@@ -35,6 +35,7 @@ class sector extends DataObject {
         $proxy = new proxy($user->getLogin(), $user->getPassword(), $seatURI, null, $connectionLimits);
         
         if ($proxy->successfullyAddedToBasket()) {
+            new notification($user, notification::NOTIFICATION_NEW_ITEMS_IN_BASKET);
             Application::log($user->getLogin() . " added " . $seatURI . " to basket");
             return $seatURI;
         }
@@ -63,7 +64,7 @@ class sector extends DataObject {
             $users = $event->getUsers();
             $user = reset($users);
         }
-        $proxy = new proxy($user->getLogin(), $user->getPassword(), $uri);
+        $proxy = new proxy($user->getLogin(), $user->getPassword(), $uri, null, settings::getInstance()->getTurboBasketConnections());
         $seats = $proxy->getSeats();
         $availableSeats = isset($seats['available']) ? $seats['available'] : array();
         

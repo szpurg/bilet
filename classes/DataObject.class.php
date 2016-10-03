@@ -2,7 +2,7 @@
 
 abstract class DataObject {
     abstract public function getDataIdentifier();
-    protected $index;
+    protected $index = null;
     
     public function save($dataKey = 0, $allowMultiply = false, $index = null) {
         $data = Application::loadData($this->getDataIdentifier());

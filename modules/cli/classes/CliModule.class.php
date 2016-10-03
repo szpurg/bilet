@@ -109,9 +109,28 @@ class CliModule {
         }
     }
     
+    public function ActionTurboPreIndex() {
+        $eventIndetifier = isset($this->args[0]) ? $this->args[0] : null;
+        $eventIndex = isset($this->args[1]) ? $this->args[1] : null;
+        
+        if ($eventIndetifier && isset($eventIndex)) {
+            $event = event::fetch($eventIndetifier, $eventIndex);
+            $users = $event->getUsers();
+            if (!$users) {
+                return false;
+            }
+            if ($event instanceof event) {
+                foreach($event->getSectors() as $sectorName) {
+                    new thread("turboIndex", array($eventIndetifier, $eventIndex, $sectorName));
+                }
+            }
+        }
+    }
+    
     public function ActionTurboIndex() {
         $eventIndetifier = isset($this->args[0]) ? $this->args[0] : null;
         $eventIndex = isset($this->args[1]) ? $this->args[1] : null;
+        $sectorName = isset($this->args[2]) ? $this->args[2] : null;
         $interval = settings::getInstance()->getTurboTimeBetweenConnections();
         
         if ($eventIndetifier && isset($eventIndex)) {
@@ -125,22 +144,20 @@ class CliModule {
             if ($event instanceof event) {
                 $end = time() + 60;
                 while(time() < $end) {
-                    $availableSectors = $event->getAvailableSectors();
-                    if ($availableSectors) {
-                        if (Application::loadData('seeking' . base64_encode($event->getIdentifier() . $event->getIndex())) == 'pause') {
-                            break;
-                        }
-                        Application::saveData('seeking' . base64_encode($event->getIdentifier() . $event->getIndex()), 'pause');
+                    if (Application::loadData('seeking' . base64_encode($event->getIdentifier() . $event->getIndex() . $sectorName)) == 'pause') {
+                        break;
+                    }
+                    $sector = sector::getInstance($event, $sectorName);
+                    $availableSeats = $sector->getAvailableSeats(null, true);
+                    if ($availableSeats) {
+                        Application::saveData('seeking' . base64_encode($event->getIdentifier() . $event->getIndex() . $sectorName), 'pause');
                         $allAvailableSeats = array();
-                        Application::saveData('available' . md5($event->getIdentifier() . $event->getIndex()), null);
-                        foreach ($availableSectors as $sectorArray) {
-                            $sector = new sector($event, $sectorArray['name']);
-                            $availableSeats = $sector->getAvailableSeats();
+                        Application::saveData('available' . md5($event->getIdentifier() . $event->getIndex() . $sectorName), null);
                             foreach($availableSeats as $seatUrl) {
                                 $user = isset($users[$userIndex]) ? $users[$userIndex] : null;
                                 $seatURI = Application::urlToURI($seatUrl);
                                 $availableSeatObject = new availableSeat($event, $seatURI);
-                                $allAvailableSeats[$sectorArray['name']][] = $availableSeatObject;
+                                $allAvailableSeats[$sectorName][] = $availableSeatObject;
                                 if ($user instanceof user) {
                                     if ($used == -1) {
                                         $used = $user->getBasketCount();
@@ -155,8 +172,7 @@ class CliModule {
                                     }
                                 }
                             }
-                            Application::saveData('available' . md5($event->getIdentifier() . $event->getIndex()), $allAvailableSeats);
-                        }
+                            Application::saveData('available' . md5($event->getIdentifier() . $event->getIndex() . $sectorName), $allAvailableSeats);
                         break;
                     }
                     else {
@@ -175,7 +191,6 @@ class CliModule {
     public function ActionCheckCaptchas() {
         running::clean();
         $activeUsers = event::getActiveEventsUsers();
-        $showMustGoOn = false;
         
         foreach($activeUsers as $user) {
             if ($user instanceof user) {
@@ -213,13 +228,19 @@ class CliModule {
             }
         }
         
-        if (!running::fetch('turboAddToBasket')) {
+        if (!running::fetch('turboAddToBasket') && !running::fetch('turboAddToBasket')) {
             foreach(event::fetchAllList() as $event) {
+                $eventFreeUsers = array();
                 foreach($event->getUsers() as $user) {
                     if ($user instanceof user) {
                         if ($user->getBasketCount() < $user->getLoginLimit()) {
-                            Application::saveData('seeking' . base64_encode($event->getIdentifier() . $event->getIndex()), null);
+                            $eventFreeUsers[] = $user;
                         }
+                    }
+                }
+                if ($eventFreeUsers) {
+                    foreach($event->getSectors() as $sectorName) {
+                        Application::saveData('seeking' . base64_encode($event->getIdentifier() . $event->getIndex() . $sectorName), null);
                     }
                 }
             }

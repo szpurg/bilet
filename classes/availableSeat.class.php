@@ -14,7 +14,7 @@ class availableSeat extends DataObject {
     }
     
     public function getDataIdentifier() {
-        return 'available' . md5($this->getEvent()->getIdentifier() . $this->getEvent()->getIndex());
+        return 'available' . md5($this->getEvent()->getIdentifier() . $this->getEvent()->getIndex() . $this->getSectorName());
     }
     
     public function getAssignedTo() {

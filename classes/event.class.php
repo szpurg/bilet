@@ -137,7 +137,7 @@ class event extends DataObject {
         $threadsCount = settings::getInstance()->getTurboSeekingThreads();
         if (is_numeric($threadsCount) && $threadsCount > 0) {
             while((int)$threadsCount--) {
-                new thread('turboIndex', array($this->getIdentifier(), $this->getIndex()));
+                new thread('turboPreIndex', array($this->getIdentifier(), $this->getIndex()));
             }
         }
     }
