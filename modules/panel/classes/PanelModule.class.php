@@ -33,6 +33,27 @@ class PanelModule {
         $this->loadTemplate('index');
     }
     
+    public function ActionSettings() {
+        $settings = settings::fetchList();
+        $definition = settings::definition();
+        
+        if ($this->getUserVar('back')) {
+            $this->redirect('index');
+        }
+        if ($this->getUserVar('save')) {
+            foreach($definition as $field => $def) {
+                settings::getInstance()->$field = $this->getUserVar($field);
+            }
+            settings::getInstance()->save();
+            
+            $this->redirect('index');
+        }
+        
+        $this->setVar('definition', $definition);
+        $this->setVar('settings', $settings);
+        $this->loadTemplate('settings');
+    }
+    
     public function ActionSaveAccount() {
         $account = $this->getUserVar('account');
         

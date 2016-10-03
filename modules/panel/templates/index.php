@@ -2,6 +2,7 @@
 <h1>Wydarzenia</h1>
 <div class="func">
     <a href="<?php print $this->getUri()?>newEvent">[Dodaj wydarzenie]</a>
+    <a href="<?php print $this->getUri()?>settings">[Ustawienia globalne]</a>
 </div>
 
 <?php if ($this->events):?>

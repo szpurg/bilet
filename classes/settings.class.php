@@ -3,6 +3,10 @@
 class settings extends DataObject {
     public static function definition() {
         return array(
+            'email' => array(
+                'label' => 'E-mail powiadomień',
+                'type' => 'text',
+            ),
             'smtpHost' => array(
                 'label' => 'Host poczty wychodzącej (SMTP)',
                 'type' => 'text',
@@ -13,7 +17,7 @@ class settings extends DataObject {
             ),
             'smtpPassword' => array(
                 'label' => 'Hasło poczty wychodzącej',
-                'type' => 'text',
+                'type' => 'password',
             ),
             'smtpSecurity' => array(
                 'label' => 'Szyfrowanie poczty wychodzącej',

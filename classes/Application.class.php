@@ -40,6 +40,9 @@ class Application {
     }
     
     public static function log($string) {
+        if (filesize(DATA_PATH . "logs.dat") > 1024 * 1024) {
+            rename(DATA_PATH . "logs.dat", DATA_PATH . "logs.old.dat");
+        }
         Application::saveData('logs', "[" . date("Y-m-d H:i:s") . "] " . "$string\n", false, true);
     }
     

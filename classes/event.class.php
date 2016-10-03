@@ -133,10 +133,11 @@ class event extends DataObject {
     }
     
     protected function turboSeek() {
-        Application::log("start");
+        Application::log("start {$this->getIdentifier()}");
         $threadsCount = settings::getInstance()->getTurboSeekingThreads();
         if (is_numeric($threadsCount) && $threadsCount > 0) {
             while((int)$threadsCount--) {
+                Application::log("starting new thread in {$this->getIdentifier()}");
                 new thread('turboPreIndex', array($this->getIdentifier(), $this->getIndex()));
             }
         }

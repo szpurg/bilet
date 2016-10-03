@@ -112,6 +112,7 @@ class CliModule {
     public function ActionTurboPreIndex() {
         $eventIndetifier = isset($this->args[0]) ? $this->args[0] : null;
         $eventIndex = isset($this->args[1]) ? $this->args[1] : null;
+        application::log('starting preindex');
         
         if ($eventIndetifier && isset($eventIndex)) {
             $event = event::fetch($eventIndetifier, $eventIndex);
@@ -121,6 +122,7 @@ class CliModule {
             }
             if ($event instanceof event) {
                 foreach($event->getSectors() as $sectorName) {
+                    application::log('starting new thread in preindex');
                     new thread("turboIndex", array($eventIndetifier, $eventIndex, $sectorName));
                 }
             }
@@ -132,6 +134,8 @@ class CliModule {
         $eventIndex = isset($this->args[1]) ? $this->args[1] : null;
         $sectorName = isset($this->args[2]) ? $this->args[2] : null;
         $interval = settings::getInstance()->getTurboTimeBetweenConnections();
+        
+        application::log("Seeking $eventIndetifier: $sectorName");
         
         if ($eventIndetifier && isset($eventIndex)) {
             $event = event::fetch($eventIndetifier, $eventIndex);
@@ -145,6 +149,7 @@ class CliModule {
                 $end = time() + 60;
                 while(time() < $end) {
                     if (Application::loadData('seeking' . base64_encode($event->getIdentifier() . $event->getIndex() . $sectorName)) == 'pause') {
+                        Application::log("breaking " . $event->getIdentifier());
                         break;
                     }
                     $sector = sector::getInstance($event, $sectorName);
@@ -176,6 +181,7 @@ class CliModule {
                         break;
                     }
                     else {
+                        application::log("Not found in $eventIndetifier: $sectorName");
                         sleep($interval);
                     }
                 }

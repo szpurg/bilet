@@ -7,13 +7,13 @@ if (!is_dir(DATA_PATH)) {
     mkdir(DATA_PATH, 0777);
 }
 
-define ( "ADMIN_EMAIL", "wiktor@dusza.in" );
+define ( "ADMIN_EMAIL", settings::get('email') );
 
-define( "MAIL_HOST", 'smtp.gmail.com' );
-define( "MAIL_SECURE", 'tls' );
-define( "MAIL_PORT", '587' );
-define( "MAIL_USERNAME", 'wiktor@dusza.in' );
-define( "MAIL_PASSWORD", 'AldiPiotr8309' );
+define( "MAIL_HOST", settings::get('smtpHost') );
+define( "MAIL_SECURE", settings::get('smtpSecurity') );
+define( "MAIL_PORT", settings::get('smtpPort') );
+define( "MAIL_USERNAME", settings::get('smtpUsername') );
+define( "MAIL_PASSWORD", settings::get('smtpPassword') );
 
 $GLOBALS['modules'] = array(
     'panel',
