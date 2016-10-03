@@ -5,6 +5,8 @@ class notification {
     const NOTIFICATION_USER_CAPTCHA_NEEDED = 2;
     const NOTIFICATION_NEW_ITEMS_IN_BASKET = 3;
     
+    protected $interval = 600;
+    
     public function __construct(user $user, $type) {
         $email = ADMIN_EMAIL;
         if (Application::loadData('notifications') !== 0) {
@@ -25,6 +27,7 @@ class notification {
                 $body = "<b>Użytkownik {$user->getLogin()} prawdopodobnie jest nieprawidłowy!</b><br>";
                 $body .= "Wejdź do panelu i usuń użytkownika:<br>";
                 $body .= "<a href='http://kupbilet.onet.pl/panel'>http://kupbilet.onet.pl/panel</a>";
+                $this->interval = 3600;
                 break;
             case self::NOTIFICATION_USER_CAPTCHA_NEEDED:
                 $subject = "BILETY - Wymagane Captcha!";
@@ -50,7 +53,7 @@ class notification {
         $emails = Application::loadData("emails");
         if (isset($emails[$type])) {
             $time = $emails[$type];
-            if ($time + 3600 > time()) {
+            if ($time + $this->interval > time()) {
                 return false;
             }
         }
