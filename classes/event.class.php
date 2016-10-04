@@ -128,6 +128,7 @@ class event extends DataObject {
     protected function normalSeek() {
         $availableSectors = $this->getAvailableSectors();
         if ($availableSectors) {
+            application::log('normal seek');
             $this->normalBuy($availableSectors);
         }
     }
