@@ -17,7 +17,7 @@ class notification {
     protected function send(user $user, $email, $type) {
         switch($type) {
             case self::NOTIFICATION_NEW_ITEMS_IN_BASKET:
-                $subject = "BILETY - Nowe pozycje w koszyku!";
+                $subject = "BILETY - {$user->getLogin()} - Nowe pozycje w koszyku!";
                 $body = "<b>Nowe pozycje w koszyku!</b><br>";
                 $body .= "Wejdź do panelu i dokończ zakup:<br>";
                 $body .= "<a href='http://kupbilet.onet.pl/panel'>http://kupbilet.onet.pl/panel</a>";
@@ -31,7 +31,7 @@ class notification {
                 break;
             case self::NOTIFICATION_USER_CAPTCHA_NEEDED:
                 $subject = "BILETY - Wymagane Captcha!";
-                $body = "<b>Jeden lub więcej użytkowników wymaga captcha!</b><br>";
+                $body = "<b>Jeden lub więcej użytkowników wymaga captcha! User {$user->getLogin()}</b><br>";
                 $body .= "Wejdź do panelu i ustaw captcha:<br>";
                 $body .= "<a href='http://kupbilet.onet.pl/panel'>http://kupbilet.onet.pl/panel</a>";
                 break;
