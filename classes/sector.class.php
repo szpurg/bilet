@@ -64,7 +64,7 @@ class sector extends DataObject {
             $users = $event->getUsers();
             $user = reset($users);
         }
-        $proxy = new proxy($user->getLogin(), $user->getPassword(), $uri, null, settings::getInstance()->get('turboSeekingConnections'));
+        $proxy = new proxy($user->getLogin(), $user->getPassword(), $uri, null, settings::getInstance()->get('turboSeekingConnections'), settings::getInstance()->get('turboTimeBetweenConnections'));
         $seats = $proxy->getSeats();
         
         if ($proxy->captchaVerificationNeeded()) {

@@ -196,7 +196,7 @@ class CliModule {
                     }
                     else {
                         application::log("Not found in $eventIndetifier: $sectorName");
-                        //sleep($interval);
+                        break;
                     }
                 }
             }

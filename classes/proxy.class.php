@@ -13,9 +13,10 @@ class proxy {
     private $password;
     private $uri;
     private $connectionLimits;
+    private $intervalBetweenConnections;
     private $cli = false;
     
-    public function __construct($login = null, $password = null, $uri = null, $argv = null, $connectionLimits = false) {
+    public function __construct($login = null, $password = null, $uri = null, $argv = null, $connectionLimits = false, $intervalBetweenConnections = 0) {
         $this->argv = $argv;
         $this->cli = isset($argv);
         $this->cookiesFile = DATA_PATH . "cookies" . md5($login . $password) . ".dat";
@@ -27,6 +28,7 @@ class proxy {
         $this->cookies = $this->getCookies();
         $this->connectionLimits = $connectionLimits;
         $this->response = $this->getResponse();
+        $this->intervalBetweenConnections = $intervalBetweenConnections;
         
         if ($login && $password) {
             $this->requiresLogin();
@@ -285,7 +287,9 @@ class proxy {
                     return false;
                 }
             }
-            sleep(settings::get('turboTimeBetweenConnections'));
+            if ($this->intervalBetweenConnections) {
+                sleep($this->intervalBetweenConnections);
+            }
         }
         $rough_content = curl_exec($ch);
         if ($this->connectionLimits || $this->connectionLimits === 0) {
