@@ -183,7 +183,7 @@ class proxy {
             $headers['Cookie'] = '';
         }
         
-        $cookie = $headers['Cookie'];
+        $cookie = isset($headers['Cookie']) ? $headers['Cookie'] : null;
         
         $cookiesStringArray = explode(";", $cookie);
         $cookies = array();
