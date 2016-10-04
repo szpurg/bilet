@@ -285,6 +285,7 @@ class proxy {
                     return false;
                 }
             }
+            sleep(settings::get('turboTimeBetweenConnections'));
         }
         $rough_content = curl_exec($ch);
         if ($this->connectionLimits || $this->connectionLimits === 0) {

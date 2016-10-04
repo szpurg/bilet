@@ -140,11 +140,23 @@ class CliModule {
         if ($eventIndetifier && isset($eventIndex)) {
             $event = event::fetch($eventIndetifier, $eventIndex);
             $users = $event->getUsers();
+            $newList = array();
+            foreach($users as $user) {
+                if ($user instanceof user) {
+                    if (!$user->getCaptchaNeeded()) {
+                        $newList[] = $user;
+                    }
+                }
+            }
+            $users = $newList;
             if (!$users) {
+                application::log('no captchaless users');
                 return false;
             }
             $userIndex = 0;
             $used = -1;
+            $indd = 0;
+            
             if ($event instanceof event) {
                 $end = time() + 60;
                 while(time() < $end) {
@@ -153,7 +165,8 @@ class CliModule {
                         break;
                     }
                     $sector = sector::getInstance($event, $sectorName);
-                    $availableSeats = $sector->getAvailableSeats(null, true);
+                    $currentUser = count($users) == 1 ? reset($users) : $users[($indd++) % count($users)];
+                    $availableSeats = $sector->getAvailableSeats($currentUser, true);
                     if ($availableSeats) {
                         Application::saveData('seeking' . base64_encode($event->getIdentifier() . $event->getIndex() . $sectorName), 'pause');
                         $allAvailableSeats = array();

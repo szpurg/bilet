@@ -66,6 +66,10 @@ class sector extends DataObject {
         }
         $proxy = new proxy($user->getLogin(), $user->getPassword(), $uri, null, settings::getInstance()->get('turboSeekingConnections'));
         $seats = $proxy->getSeats();
+        
+        if ($proxy->captchaVerificationNeeded()) {
+            Application::log($user->getLogin() . ' captcha needed');
+        }
         $availableSeats = isset($seats['available']) ? $seats['available'] : array();
         
         if ($this->getEvent()->getReverseBuy()) {
