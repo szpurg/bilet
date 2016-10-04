@@ -39,6 +39,11 @@ class settings extends DataObject {
                 'type' => 'text',
                 'default' => 3,
             ),
+            'turboSeekingConnections' => array(
+                'label' => 'Maksymalna liczba połączeń podczas przeszukiwania sektorów (tryb turbo)',
+                'type' => 'text',
+                'default' => 2,
+            ),
             'turboBasketConnections' => array(
                 'label' => 'Maksymalna liczba połączeń podczas dodawania miejsc do koszyka (tryb turbo)',
                 'type' => 'text',

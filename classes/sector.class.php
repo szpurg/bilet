@@ -64,7 +64,7 @@ class sector extends DataObject {
             $users = $event->getUsers();
             $user = reset($users);
         }
-        $proxy = new proxy($user->getLogin(), $user->getPassword(), $uri, null, settings::getInstance()->getTurboBasketConnections());
+        $proxy = new proxy($user->getLogin(), $user->getPassword(), $uri, null, settings::getInstance()->get('turboSeekingConnections'));
         $seats = $proxy->getSeats();
         $availableSeats = isset($seats['available']) ? $seats['available'] : array();
         
