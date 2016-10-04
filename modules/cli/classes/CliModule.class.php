@@ -166,6 +166,7 @@ class CliModule {
                     }
                     $sector = sector::getInstance($event, $sectorName);
                     $currentUser = count($users) == 1 ? reset($users) : $users[($indd++) % count($users)];
+                    application::log('seeking for ' . $currentUser->getLogin());
                     $availableSeats = $sector->getAvailableSeats($currentUser, true);
                     if ($availableSeats) {
                         Application::saveData('seeking' . base64_encode($event->getIdentifier() . $event->getIndex() . $sectorName), 'pause');
