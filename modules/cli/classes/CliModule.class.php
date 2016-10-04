@@ -155,7 +155,7 @@ class CliModule {
             }
             $userIndex = 0;
             $used = -1;
-            $indd = 0;
+            $indd = rand(0, count($users) - 1);
             
             if ($event instanceof event) {
                 $end = time() + 60;
@@ -165,7 +165,7 @@ class CliModule {
                         break;
                     }
                     $sector = sector::getInstance($event, $sectorName);
-                    $currentUser = count($users) == 1 ? reset($users) : $users[($indd++) % count($users)];
+                    $currentUser = count($users) == 1 ? reset($users) : $users[$indd];
                     application::log('seeking for ' . $currentUser->getLogin());
                     $availableSeats = $sector->getAvailableSeats($currentUser, true);
                     if ($availableSeats) {
