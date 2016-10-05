@@ -13,9 +13,10 @@ class proxy {
     private $password;
     private $uri;
     private $connectionLimits;
+    private $intervalBetweenConnections;
     private $cli = false;
     
-    public function __construct($login = null, $password = null, $uri = null, $argv = null, $connectionLimits = false) {
+    public function __construct($login = null, $password = null, $uri = null, $argv = null, $connectionLimits = false, $intervalBetweenConnections = 0) {
         $this->argv = $argv;
         $this->cli = isset($argv);
         $this->cookiesFile = DATA_PATH . "cookies" . md5($login . $password) . ".dat";
@@ -27,6 +28,7 @@ class proxy {
         $this->cookies = $this->getCookies();
         $this->connectionLimits = $connectionLimits;
         $this->response = $this->getResponse();
+        $this->intervalBetweenConnections = $intervalBetweenConnections;
         
         if ($login && $password) {
             $this->requiresLogin();
@@ -181,7 +183,7 @@ class proxy {
             $headers['Cookie'] = '';
         }
         
-        $cookie = $headers['Cookie'];
+        $cookie = isset($headers['Cookie']) ? $headers['Cookie'] : null;
         
         $cookiesStringArray = explode(";", $cookie);
         $cookies = array();
@@ -240,6 +242,12 @@ class proxy {
             $posts = "Login={$this->login}&Password={$this->password}";
             $this->getResponse($action, $posts);
             $this->response = $this->getResponse();
+            if ($this->loggedIn()) {
+                Application::log("{$this->login} logged in");
+            }
+            else {
+                Application::log("[error] {$this->login} login failed");
+            }
         }
     }
     
@@ -284,6 +292,9 @@ class proxy {
                 if ($counter <= 0) {
                     return false;
                 }
+            }
+            if ($this->intervalBetweenConnections) {
+                sleep($this->intervalBetweenConnections);
             }
         }
         $rough_content = curl_exec($ch);

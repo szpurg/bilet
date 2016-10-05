@@ -50,6 +50,13 @@ class user extends DataObject {
         return $this->login;
     }
     
+    public function cleanCookies() {
+        if (file_exists(DATA_PATH . "cookies" . md5($this->getLogin() . $this->getPassword()) . ".dat")) {
+            unlink(DATA_PATH . "cookies" . md5($this->getLogin() . $this->getPassword()) . ".dat");
+            Application::log("Cleaning {$this->getLogin()} cookies");
+        }
+    }
+    
     public function getActiveRelatedSectorUri() {
         foreach(event::fetchAllList() as $event) {
             if ($event->getActive()) {
