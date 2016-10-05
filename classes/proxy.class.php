@@ -242,6 +242,12 @@ class proxy {
             $posts = "Login={$this->login}&Password={$this->password}";
             $this->getResponse($action, $posts);
             $this->response = $this->getResponse();
+            if ($this->loggedIn()) {
+                Application::log("{$this->login} logged in");
+            }
+            else {
+                Application::log("[error] {$this->login} login failed");
+            }
         }
     }
     

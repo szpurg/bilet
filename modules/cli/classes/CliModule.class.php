@@ -213,7 +213,7 @@ class CliModule {
         $activeUsers = event::getActiveEventsUsers();
         
         foreach($activeUsers as $user) {
-            if ($user instanceof user) {
+            if ($user instanceof user && !$user->getCaptchaNeeded()) {
                 $status = $user->checkAccount();
                 $save = false;
                 if ($status === -1) {
@@ -233,6 +233,7 @@ class CliModule {
                     if (!$user->getCaptchaNeeded()) {
                         $save = true;
                         $user->setCaptchaNeeded(true);
+                        $user->cleanCookies();
                         new notification($user, notification::NOTIFICATION_USER_CAPTCHA_NEEDED);
                     }
                 }
