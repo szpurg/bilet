@@ -214,12 +214,14 @@ class CliModule {
         
         foreach($activeUsers as $user) {
             if ($user instanceof user && !$user->getCaptchaNeeded()) {
+                Application::log("[STATUS] Checking {$user->getLogin()} status");
                 $status = $user->checkAccount();
                 $save = false;
                 if ($status === -1) {
                     if (!$user->getInvalid()) {
                         $save = true;
                         $user->setInvalid(true);
+                        Application::log("[STATUS-ERROR] {$user->getLogin()} login error");
                         new notification($user, notification::NOTIFICATION_USER_INVALID);
                     }
                 }
@@ -227,6 +229,7 @@ class CliModule {
                     if ($user->getInvalid()) {
                         $save = true;
                         $user->setInvalid(false);
+                        Application::log("[STATUS-REVALID] {$user->getLogin()} was invalid, but aint anymore");
                     }
                 }
                 if ($status === false) {
@@ -234,6 +237,7 @@ class CliModule {
                         $save = true;
                         $user->setCaptchaNeeded(true);
                         $user->cleanCookies();
+                        Application::log("[STATUS-CAPTCHA] {$user->getLogin()} Captcha needed");
                         new notification($user, notification::NOTIFICATION_USER_CAPTCHA_NEEDED);
                     }
                 }
@@ -241,6 +245,7 @@ class CliModule {
                     if ($user->getCaptchaNeeded()) {
                         $save = true;
                         $user->setCaptchaNeeded(false);
+                        Application::log("[STATUS-CAPTCHA-OK] {$user->getLogin()} Captcha OK");
                     }
                 }
                 if ($save) {
