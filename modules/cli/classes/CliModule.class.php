@@ -204,7 +204,7 @@ class CliModule {
     }
     
     public function ActionEm() {
-        $user = user::fetch('musictechnowarsaw');
+        $user = reset(user::fetchList());
         new notification($user, 3);
     }
     
