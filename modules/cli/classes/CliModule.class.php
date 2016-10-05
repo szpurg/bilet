@@ -237,7 +237,7 @@ class CliModule {
                         $save = true;
                         $user->setCaptchaNeeded(true);
                         $user->cleanCookies();
-                        Application::log("[STATUS-CAPTCHA] {$user->getLogin()} Captcha needed");
+                        Application::log("[STATUS-ERROR-CAPTCHA] {$user->getLogin()} Captcha needed");
                         new notification($user, notification::NOTIFICATION_USER_CAPTCHA_NEEDED);
                     }
                 }
@@ -245,7 +245,10 @@ class CliModule {
                     if ($user->getCaptchaNeeded()) {
                         $save = true;
                         $user->setCaptchaNeeded(false);
-                        Application::log("[STATUS-CAPTCHA-OK] {$user->getLogin()} Captcha OK");
+                        Application::log("[STATUS-CAPTCHA-REOK] {$user->getLogin()} Captcha is reactivated");
+                    }
+                    else {
+                        Application::log("[STATUS-CAPTCHA] {$user->getLogin()} Captcha is OK");
                     }
                 }
                 if ($save) {
