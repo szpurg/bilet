@@ -7,6 +7,9 @@ class event extends DataObject {
     protected $users;
     protected $settings;
     
+    const NORMAL_TIME_INTERVAL = 5;
+    const TURBO_TIME_INTERVAL = 3;
+    
     public function __toString() {
         return $this->identifier . "[" . $this->getIndex() . "]";
     }
@@ -107,13 +110,38 @@ class event extends DataObject {
     
     public function seek() {
         if ($this->getActive()) {
-            if ($this->getTurbo()) {
+            $cronTimeOK = $this->cronTimeOK();
+            if ($this->getTurbo() && $cronTimeOK->turbo) {
+                $this->saveCron();
                 $this->turboSeek();
             }
-            else {
-                $this->normalSeek();
+            else if ($cronTimeOK->normal) {
+                $this->saveCron();
+                $this->turboSeek();
             }
         }
+    }
+    
+    protected function saveCron() {
+        Application::saveData('cron' . md5($this->identifier . $this->index), time());
+    }
+    
+    protected function cronTimeOK() {
+        $lastCron = Application::loadData('cron' . md5($this->identifier . $this->index));
+        $returner = new stdClass;
+        $returner->normal = true;
+        $returner->turbo = true;
+        
+        if ($lastCron) {
+            if ($lastCron + self::TURBO_TIME_INTERVAL * 60 > time()) {
+                $returner->turbo = false;
+            }
+            if ($lastCron + self::NORMAL_TIME_INTERVAL * 60 > time()) {
+                $returner->normal = false;
+            }
+        }
+        
+        return $returner;
     }
     
     protected function normalBuy($availableSectors) {
