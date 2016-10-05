@@ -8,7 +8,7 @@
             <?php if ($this->sectors): ?>
                 <?php foreach ($this->sectors as $sector): ?>
                     <div>
-                        <label><input type="checkbox" name="sectors[]"<?php print in_array($sector['name'], $this->event->getSectors()) ? ' checked="1"' : ''?>value="<?php print $sector['name'] ?>" /><?php print $sector['name'] . " (" . $sector['available'] . ")" ?></label>
+                        <label><input type="checkbox" name="sectors[]"<?php print in_array($sector['name'], $this->event->getSectors() ? $this->event->getSectors() : array()) ? ' checked="1"' : ''?>value="<?php print $sector['name'] ?>" /><?php print $sector['name'] . " (" . $sector['available'] . ")" ?></label>
                     </div>
                 <?php endforeach; ?>
             <?php endif ?>
