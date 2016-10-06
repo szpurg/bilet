@@ -107,11 +107,11 @@ class availableSeat extends DataObject {
             usleep(100000);
             $limit--;
             if ($limit <= 0) {
-                Application::log("[ERROR][BASKET-AVAILABLE-SEATS] of " . $event->getIdentifier() , " was NOT found in $seatURI context");
+                Application::log("[ERROR][BASKET-AVAILABLE-SEATS] of " . $event->getIdentifier() . " was NOT found in $seatURI context");
                 return false;
             }
         }
-        Application::log("[BASKET-AVAILABLE-SEATS] of " . $event->getIdentifier() , " was found in $seatURI context");
+        Application::log("[BASKET-AVAILABLE-SEATS] of " . $event->getIdentifier() . " was found in $seatURI context");
         return true;
     }
 
