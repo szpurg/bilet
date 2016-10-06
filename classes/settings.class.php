@@ -34,6 +34,11 @@ class settings extends DataObject {
                 'type' => 'text',
                 'default' => 25,
             ),
+            'turboMainInterval' => array(
+                'label' => 'Interwał sprawdzania sektorów w minutach (tryb turbo)',
+                'type' => 'text',
+                'default' => 3,
+            ),
             'turboSeekingThreads' => array(
                 'label' => 'Liczba procesów wyszukiwania dostępnych miejsc (tryb turbo)',
                 'type' => 'text',

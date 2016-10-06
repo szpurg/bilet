@@ -132,8 +132,10 @@ class event extends DataObject {
         $returner->normal = true;
         $returner->turbo = true;
         
+        $turboTimeInterval = is_numeric(settings::get('turboMainInterval')) ? settings::get('turboMainInterval') : self::TURBO_TIME_INTERVAL;
+        
         if ($lastCron) {
-            if ($lastCron + self::TURBO_TIME_INTERVAL * 60 > time()) {
+            if ($lastCron + $turboTimeInterval * 60 > time()) {
                 $returner->turbo = false;
             }
             if ($lastCron + self::NORMAL_TIME_INTERVAL * 60 > time()) {
