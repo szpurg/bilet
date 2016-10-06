@@ -32,6 +32,7 @@ class sector extends DataObject {
         else if ($try == 5) {
             return false;
         }
+        Application::log('[BASKET] ' . $login . " $try try of adding " . $seatURI . " to basket");
         $proxy = new proxy($user->getLogin(), $user->getPassword(), $seatURI, null, $connectionLimits);
         
         if ($proxy->successfullyAddedToBasket()) {
@@ -40,10 +41,15 @@ class sector extends DataObject {
             return $seatURI;
         }
         else if ($proxy->getBasketCount() != -1) {
+            Application::log('[BASKET-ERROR] ' . $login . " failed tring to add " . $seatURI . " to basket");
             if (availableSeat::availableSeatTableReady($event, $seatURI)) {
                 $nextSeat = availableSeat::fetchByUri($event, $seatURI, true);
                 if ($nextSeat) {
+                    Application::log('[BASKET-STATUS] ' . $login . " is going to try adding another seat " . $seatURI . " to basket");
                     return $this->tryAddingSeatToBasket($event, $user, $nextSeat->getUri(), $connectionLimits);
+                }
+                else {
+                    Application::log('[BASKET-STATUS] ' . $login . " stops, as there is no more available seats.");
                 }
             }
         }
