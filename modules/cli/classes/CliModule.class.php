@@ -65,7 +65,8 @@ class CliModule {
             }
             die("Invalid argument\n");
         }
-        die("No arguments\n");
+        print (Application::loadData('notifications') ? 'Notifications enabled' : 'Notifications disabled') . "\n";
+        die;
     }
     
     protected function initProcess() {
@@ -206,6 +207,10 @@ class CliModule {
     public function ActionEm() {
         $user = reset(user::fetchList());
         new notification($user, 3);
+    }
+    
+    public function ActionEmail() {
+        new email(ADMIN_EMAIL, null, null, "Testowa wiadomość", "Treść testowej wiadomości <b>HTML</b>");
     }
     
     public function ActionCheckCaptchas() {

@@ -16,29 +16,36 @@ class email {
      */
 
     function __construct($email, $from, $name, $temat, $tresc, $alt = null) {
-        $mail=new PHPMailer();
- 
-        $mail->IsSMTP();
-        $mail->CharSet = 'UTF-8';
-        $mail->SMTPDebug=1;
-        $mail->SMTPAuth=true;
-        $mail->SMTPSecure=MAIL_SECURE;
-        $mail->Host=MAIL_HOST;
-        $mail->Port=MAIL_PORT;
-        $mail->IsHTML(true);
-        $mail->Username=MAIL_USERNAME;
-        $mail->Password=MAIL_PASSWORD;
-        $mail->From = MAIL_USERNAME;
-        $mail->FromName = 'Kup Bilet';
-        $mail->Subject=$temat;
-        $mail->Body=$tresc;
-        $mail->AddAddress($email);
-        if (!$mail->Send()) {
-            echo "There has been a mail error <br>";
-            echo $mail->ErrorInfo . "<br>";exit;
-        }
+//        $mail=new PHPMailer();
+// 
+//        $mail->IsSMTP();
+//        $mail->CharSet = 'UTF-8';
+//        $mail->SMTPDebug=1;
+//        $mail->SMTPAuth=true;
+//        $mail->SMTPSecure=MAIL_SECURE;
+//        $mail->Host=MAIL_HOST;
+//        $mail->Port=MAIL_PORT;
+//        $mail->IsHTML(true);
+//        $mail->Username=MAIL_USERNAME;
+//        $mail->Password=MAIL_PASSWORD;
+//        $mail->From = MAIL_USERNAME;
+//        $mail->FromName = 'Kup Bilet';
+//        $mail->Subject=$temat;
+//        $mail->Body=$tresc;
+//        $mail->AddAddress($email);
+//        if (!$mail->Send()) {
+//            echo "There has been a mail error <br>";
+//            echo $mail->ErrorInfo . "<br>";exit;
+//        }
+        
+        $this->mail_utf8($email, $temat, $tresc);
     }
 
+    function mail_utf8($to, $subject = '(No subject)', $message = '', $header = '') {
+      $header_ = 'MIME-Version: 1.0' . "\r\n" . 'Content-type: text/html; charset=UTF-8' . "\r\n";
+      mail($to, '=?UTF-8?B?'.base64_encode($subject).'?=', $message, $header_ . $header);
+    }    
+    
 }
 
 ?>

@@ -7,33 +7,33 @@ class settings extends DataObject {
                 'label' => 'E-mail powiadomień',
                 'type' => 'text',
             ),
-            'smtpHost' => array(
-                'label' => 'Host poczty wychodzącej (SMTP)',
-                'type' => 'text',
-            ),
-            'smtpUsername' => array(
-                'label' => 'Login poczty wychodzącej',
-                'type' => 'text',
-            ),
-            'smtpPassword' => array(
-                'label' => 'Hasło poczty wychodzącej',
-                'type' => 'password',
-            ),
-            'smtpSecurity' => array(
-                'label' => 'Szyfrowanie poczty wychodzącej',
-                'type' => 'select',
-                'choices' => array(
-                    '' => 'brak',
-                    'ssl' => 'ssl',
-                    'tls' => 'tls',
-                ),
-                'default' => '',
-            ),
-            'smtpPort' => array(
-                'label' => 'Port poczty wychodzącej',
-                'type' => 'text',
-                'default' => 25,
-            ),
+//            'smtpHost' => array(
+//                'label' => 'Host poczty wychodzącej (SMTP)',
+//                'type' => 'text',
+//            ),
+//            'smtpUsername' => array(
+//                'label' => 'Login poczty wychodzącej',
+//                'type' => 'text',
+//            ),
+//            'smtpPassword' => array(
+//                'label' => 'Hasło poczty wychodzącej',
+//                'type' => 'password',
+//            ),
+//            'smtpSecurity' => array(
+//                'label' => 'Szyfrowanie poczty wychodzącej',
+//                'type' => 'select',
+//                'choices' => array(
+//                    '' => 'brak',
+//                    'ssl' => 'ssl',
+//                    'tls' => 'tls',
+//                ),
+//                'default' => '',
+//            ),
+//            'smtpPort' => array(
+//                'label' => 'Port poczty wychodzącej',
+//                'type' => 'text',
+//                'default' => 25,
+//            ),
             'turboMainInterval' => array(
                 'label' => 'Interwał sprawdzania sektorów w minutach (tryb turbo)',
                 'type' => 'text',
