@@ -159,6 +159,7 @@ class CliModule {
             $indd = rand(0, count($users) - 1);
             
             if ($event instanceof event) {
+                $minPlaces = $event->getSetting('minPlaces');
                 $end = time() + 60;
                 while(time() < $end) {
                     if (Application::loadData('seeking' . base64_encode($event->getIdentifier() . $event->getIndex() . $sectorName)) == 'pause') {
@@ -170,30 +171,35 @@ class CliModule {
                     application::log('seeking for ' . $currentUser->getLogin());
                     $availableSeats = $sector->getAvailableSeats($currentUser, true);
                     if ($availableSeats) {
-                        Application::saveData('seeking' . base64_encode($event->getIdentifier() . $event->getIndex() . $sectorName), 'pause');
-                        $allAvailableSeats = array();
-                        Application::saveData('available' . md5($event->getIdentifier() . $event->getIndex() . $sectorName), null);
-                            foreach($availableSeats as $seatUrl) {
-                                $user = isset($users[$userIndex]) ? $users[$userIndex] : null;
-                                $seatURI = Application::urlToURI($seatUrl);
-                                $availableSeatObject = new availableSeat($event, $seatURI);
-                                $allAvailableSeats[$sectorName][] = $availableSeatObject;
-                                if ($user instanceof user) {
-                                    if ($used == -1) {
-                                        $used = $user->getBasketCount();
-                                    }
-                                    $availableSeatObject->setAssignedTo($user);
-                                    $availableSeatObject->setRunning(true);
-                                    new thread('turboAddToBasket', array($user->getLogin(), $seatURI, $event->getIdentifier(), $event->getIndex()));
-                                    $used++;
-                                    if ($user->getLoginLimit() <= $used) {
-                                        $used = -1;
-                                        $userIndex++;
+                        if (!$minPlaces || count($availableSeats) >= $minPlaces) {
+                            Application::saveData('seeking' . base64_encode($event->getIdentifier() . $event->getIndex() . $sectorName), 'pause');
+                            $allAvailableSeats = array();
+                            Application::saveData('available' . md5($event->getIdentifier() . $event->getIndex() . $sectorName), null);
+                                foreach($availableSeats as $seatUrl) {
+                                    $user = isset($users[$userIndex]) ? $users[$userIndex] : null;
+                                    $seatURI = Application::urlToURI($seatUrl);
+                                    $availableSeatObject = new availableSeat($event, $seatURI);
+                                    $allAvailableSeats[$sectorName][] = $availableSeatObject;
+                                    if ($user instanceof user) {
+                                        if ($used == -1) {
+                                            $used = $user->getBasketCount();
+                                        }
+                                        $availableSeatObject->setAssignedTo($user);
+                                        $availableSeatObject->setRunning(true);
+                                        new thread('turboAddToBasket', array($user->getLogin(), $seatURI, $event->getIdentifier(), $event->getIndex()));
+                                        $used++;
+                                        if ($user->getLoginLimit() <= $used) {
+                                            $used = -1;
+                                            $userIndex++;
+                                        }
                                     }
                                 }
-                            }
-                            Application::saveData('available' . md5($event->getIdentifier() . $event->getIndex() . $sectorName), $allAvailableSeats);
-                        break;
+                                Application::saveData('available' . md5($event->getIdentifier() . $event->getIndex() . $sectorName), $allAvailableSeats);
+                            break;
+                        }
+                        else if ($minPlaces) {
+                            application::log("$eventIndetifier: $sectorName had " . count($availableSeats) . " available seats, but minimum limit was $minPlaces");
+                        }
                     }
                     else {
                         application::log("Not found in $eventIndetifier: $sectorName");

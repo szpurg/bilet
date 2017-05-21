@@ -40,6 +40,15 @@
             <div>
                 <label><input type="checkbox" name="settings[reverseBuy]" value="1" <?php print $this->event->getSetting('reverseBuy') ? ' checked="1"' : ''?>/> Kupuj od dołu</label>
             </div>
+            <div>
+                <label>Minimalna liczba miejsc w sektorze:</label>
+                <select name="settings[minPlaces]">
+                    <option value='0'>Bez limitu</option>
+                    <?php for ($i = 2; $i <= 10; $i++):?>
+                    <option value='<?php print $i?>' <?php print $this->event->getSetting('minPlaces') == $i ? " selected='1'" : ""?>><?php print $i?></option>
+                    <?php endfor ?>
+                </select>
+            </div>
         </div>
     </div>
     <div style="clear: both"></div>
