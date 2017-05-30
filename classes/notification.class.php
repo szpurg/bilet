@@ -40,6 +40,7 @@ class notification {
         }
         
         if ($this->canSend($type)) {
+            Application::log("Wysylka powiadomienia ($type)", "notifications.log");
             new email($email, '', '', $subject, $body);
             $emails = Application::loadData("emails");
             $emails[$type] = time();

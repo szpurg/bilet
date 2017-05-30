@@ -39,11 +39,11 @@ class Application {
         fclose($file);
     }
     
-    public static function log($string) {
-        if (filesize(DATA_PATH . "logs.dat") > 1024 * 1024) {
-            rename(DATA_PATH . "logs.dat", DATA_PATH . "logs.old.dat");
+    public static function log($string, $file = "main.log") {
+        if (filesize(DATA_PATH . $file . ".dat") > 1024 * 1024) {
+            rename(DATA_PATH . $file . ".dat", DATA_PATH . "$file.old");
         }
-        Application::saveData('logs', "[" . date("Y-m-d H:i:s") . "] " . "$string\n", false, true);
+        Application::saveData($file, "[" . date("Y-m-d H:i:s") . "] " . "$string\n", false, true);
     }
     
     public static function incrementDataIfLessThan($dataName, $lessThan) {
