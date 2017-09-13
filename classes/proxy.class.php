@@ -151,7 +151,7 @@ class proxy {
             $queryString = http_build_query($gets);
         }
         
-        return "https://kupbilet.onet.pl/{$this->uri}" . ($queryString ? '?' . $queryString : '');
+        return "https://www.kupbilet.pl/{$this->uri}" . ($queryString ? '?' . $queryString : '');
     }
     
     private function getPosts() {

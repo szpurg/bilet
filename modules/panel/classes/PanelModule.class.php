@@ -214,7 +214,7 @@ class PanelModule {
     }
     
     public function redirect($action) {
-        $url = 'http://kupbilet.onet.pl' . MODULE_URI . ($action != "index" ? $action : '');
+        $url = 'http://www.kupbilet.pl' . MODULE_URI . ($action != "index" ? $action : '');
         header("Location: " . $url);
         die;
     }
