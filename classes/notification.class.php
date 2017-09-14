@@ -20,20 +20,20 @@ class notification {
                 $subject = "BILETY - {$user->getLogin()} - Nowe pozycje w koszyku!";
                 $body = "<b>Nowe pozycje w koszyku!</b><br>";
                 $body .= "Wejdź do panelu i dokończ zakup:<br>";
-                $body .= "<a href='http://www.kupbilet.pl/panel'>http://kupbilet.onet.pl/panel</a>";
+                $body .= "<a href='http://www.kupbilet.pl/panel'>http://www.kupbilet.pl/panel</a>";
                 break;
             case self::NOTIFICATION_USER_INVALID:
                 $subject = "BILETY - Nieprawidłowy użytkownik!";
                 $body = "<b>Użytkownik {$user->getLogin()} prawdopodobnie jest nieprawidłowy!</b><br>";
                 $body .= "Wejdź do panelu i usuń użytkownika:<br>";
-                $body .= "<a href='http://www.kupbilet.pl/panel'>http://kupbilet.onet.pl/panel</a>";
+                $body .= "<a href='http://www.kupbilet.pl/panel'>http://www.kupbilet.pl/panel</a>";
                 $this->interval = 3600;
                 break;
             case self::NOTIFICATION_USER_CAPTCHA_NEEDED:
                 $subject = "BILETY - Wymagane Captcha!";
                 $body = "<b>Jeden lub więcej użytkowników wymaga captcha! User {$user->getLogin()}</b><br>";
                 $body .= "Wejdź do panelu i ustaw captcha:<br>";
-                $body .= "<a href='http://www.kupbilet.pl/panel'>http://kupbilet.onet.pl/panel</a>";
+                $body .= "<a href='http://www.kupbilet.pl/panel'>http://www.kupbilet.pl/panel</a>";
                 break;
             default:
                 return false;
