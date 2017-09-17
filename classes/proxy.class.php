@@ -237,7 +237,7 @@ class proxy {
         
         $cookies = array();
         foreach($headers as $header) {
-            if (preg_match("#^set\-cookie: (.+?)\=(.+?);#", $header, $matches)) {
+            if (preg_match("#^set\-cookie: (.+?)\=(.+?);#i", $header, $matches)) {
                 $cookies[$matches[1]] = $matches[2];
             }
         }
